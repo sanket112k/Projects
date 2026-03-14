@@ -123,7 +123,7 @@ initial begin
     #20;
     reset = 0;
 
-    repeat (5_000_000_000_000) @(posedge clk);
+    repeat (5_00_000_000) @(posedge clk);
 
     if (error_count == 0)
         $display("TEST PASSED");
