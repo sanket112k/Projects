@@ -1,4 +1,4 @@
-module bcd_counter #(parameter MAX_TENS = 5)(
+module bcd_counter #(parameter [3:0] MAX_TENS = 4'd5)(
 	input clk,
     input reset,
     input ena,
@@ -10,9 +10,9 @@ reg [3:0] msd;  // msd - most significant digit
 reg [3:0] lsd;  // lsd - least significant digit
 
 assign q = {msd, lsd};
-assign carry = ena && (q == {MAX_TENS[3:0], 4'd9});
+assign carry = ena && (msd == MAX_TENS) && (lsd == 4'd9);
 
-always @(posedge clk or posedge reset) begin
+always @(posedge clk) begin
     if(reset)
         {msd, lsd} <= 8'h00;
     else if(ena) begin 
