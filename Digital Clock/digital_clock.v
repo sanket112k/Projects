@@ -1,4 +1,4 @@
-`include "bcd_counter.v"
+//`include "bcd_counter.v"
 module digital_clock(
     input clk,
     input reset,    // async active high reset
