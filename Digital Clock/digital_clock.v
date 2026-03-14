@@ -1,3 +1,4 @@
+`include "bcd_counter.v"
 module digital_clock(
     input clk,
     input reset,    // async active high reset
@@ -48,36 +49,6 @@ always @(posedge clk or posedge reset) begin
             end
             else hh[3:0] <= hh[3:0] + 1'b1;
         end
-    end
-end
-endmodule
-
-
-
-module bcd_counter #(parameter MAX_TENS = 5)(
-	input clk,
-    input reset,
-    input ena,
-    output reg [7:0] q,
-    output wire carry
-);
-
-assign carry = ena && (q == {MAX_TENS[3:0], 4'd9});
-
-always @(posedge clk or posedge reset) begin
-    if(reset)
-        q <= 8'h00;
-    else if(ena) begin 
-        if(q[3:0] == 4'h9) begin
-            if(q[7:4] == MAX_TENS)
-                q <= 8'h00;
-            else begin
-                q[3:0] <= 4'h0;
-                q[7:4] <= q[7:4] + 1'b1;
-            end 
-        end
-        else
-            q[3:0] <= q[3:0] + 1'b1; 
     end
 end
 endmodule
