@@ -6,26 +6,26 @@ module bcd_counter #(parameter MAX_TENS = 5)(
     output wire carry
 );
 
-reg [3:0] msb;
-reg [3:0] lsb;
+reg [3:0] msd;  // msd - most significant digit
+reg [3:0] lsd;  // lsd - least significant digit
 
-assign q = {msb, lsb};
+assign q = {msd, lsd};
 assign carry = ena && (q == {MAX_TENS[3:0], 4'd9});
 
 always @(posedge clk or posedge reset) begin
     if(reset)
-        {msb, lsb} <= 8'h00;
+        {msd, lsd} <= 8'h00;
     else if(ena) begin 
-        if(lsb == 4'h9) begin
-            if(msb == MAX_TENS)
-                {msb, lsb} <= 8'h00;
+        if(lsd == 4'h9) begin
+            if(msd == MAX_TENS)
+                {msd, lsd} <= 8'h00;
             else begin
-                lsb <= 4'h0;
-                msb <= msb + 1'b1;
+                lsd <= 4'h0;
+                msd <= msd + 1'b1;
             end 
         end
         else
-            lsb <= lsb + 1'b1; 
+            lsd <= lsd + 1'b1; 
     end
 end
 endmodule
