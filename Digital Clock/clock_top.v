@@ -1,5 +1,5 @@
-`include "enable_generator.v"
-`include "digital_clock.v"
+//`include "enable_generator.v"
+//`include "digital_clock.v"
 module clock_top(
     input clk,       // 50 MHz
     input reset,
