@@ -1,6 +1,6 @@
 module fifomem #(
     parameter DATA_WIDTH = 8,
-    parameter ADDR_WIDTH = 8
+    parameter ADDR_WIDTH = 4
 )(
     input w_clk,
     input w_en,
@@ -12,7 +12,6 @@ module fifomem #(
     input [ADDR_WIDTH-1:0] r_addr,
     output reg [DATA_WIDTH-1:0] r_data,
 );
-
 localparam RAM_DEPTH = 1 << ADDR_WIDTH;
 
 reg [DATA_WIDTH-1:0] mem [0:RAM_DEPTH-1];
@@ -24,5 +23,4 @@ end
 always @ (posedge r_clk) begin:read
     if(R_en) r_data <= mem[r_addr];
 end
-
 endmodule
