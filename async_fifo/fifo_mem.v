@@ -11,17 +11,16 @@ module fifo_mem #(
     input rclk,
     input ren,
     input [ADDR_WIDTH-1:0] raddr,
-    output reg [DATA_WIDTH-1:0] rdata,
+    output reg [DATA_WIDTH-1:0] rdata
 );
 localparam RAM_DEPTH = 1 << ADDR_WIDTH;
 
 reg [DATA_WIDTH-1:0] mem [0:RAM_DEPTH-1];
 
-always @ (posedge w_clk) begin:write
+always @(posedge wclk)
     if (wen) mem[waddr] <= wdata;
-end
 
-always @ (posedge r_clk) begin:read
-    if(ren) rdata <= mem[raddr];
-end
+always @(posedge rclk)
+    rdata <= mem[raddr];
+
 endmodule
