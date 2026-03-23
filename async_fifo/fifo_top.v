@@ -1,43 +1,77 @@
-// FIFO top-level module
+/* FIFO top module
+*           fifo_top
+           /    |    \
+          /     |     \
+   write_ctrl  mem   read_ctrl
+         |              |
+       sync            sync
+*/
 module fifo_top #(
     parameter DATA_WIDTH = 8,
-    parameter ADDR_WIDTH = 4
+    parameter DEPTH = 4
 )(
     input wclk,
     input wreset,
-    input winc,
+    input wen,
+    input [DATA_WIDTH-1:0] wdata,
     output full,
-    output [DATA_WIDTH-1:0] wdata,
 
     input rclk,
     input rreset,
-    input rinc,
+    input ren,
+    output [DATA_WIDTH-1:0] rdata,
     output empty,
-    output [DATA_WIDTH-1:0] rdata
+    output rvalid
 );
+localparam ADDR_WIDTH = $clog2(DEPTH);
 wire [ADDR_WIDTH-1:0] waddr, raddr;
-wire [ADDR_WIDTH:0] wptr, rptr, wrptr2, rwptr2;
+wire [ADDR_WIDTH:0] wptr_gray, rptr_gray, rptr_sync, wptr_sync;
 
-sync_r2w sync_r2w
-(.wrptr2(wrptr2), .rptr(rptr),
-.wclk(wclk), .wrst_n(wrst_n));
+fifo_mem #(DATA_WIDTH, ADDR_WIDTH) fifo_mem(
+    .wclk(wclk),
+    .wen(wen & ~full),
+    .waddr(waddr),
+    .wdata(wdata),
 
-sync_w2r sync_w2r
-(.rwptr2(rwptr2), .wptr(wptr),
-.rclk(rclk), .rrst_n(rrst_n));
+    .rclk(rclk),
+    .ren(ren & ~empty),
+    .raddr(raddr),
+    .rdata(rdata)
+);
 
-fifomem #(DSIZE, ASIZE) fifomem
-(.rdata(rdata), .wdata(wdata),
-.waddr(waddr), .raddr(raddr),
-.wclken(winc), .wclk(wclk));
+fifo_sync #(ADDR_WIDTH) r2w(
+    .xclk(wclk),
+    .xreset(wreset),
+    .ptr_in(rptr_gray),
+    .ptr_out(rptr_sync)
+);
 
-rptr_empty #(ASIZE) rptr_empty
-(.rempty(rempty), .raddr(raddr),
-.rptr(rptr), .rwptr2(rwptr2),
-.rinc(rinc), .rclk(rclk), .rrst_n(rrst_n));
+fifo_sync #(ADDR_WIDTH) w2r(
+    .xclk(rclk),
+    .xreset(rreset),
+    .ptr_in(wptr_gray),
+    .ptr_out(wptr_sync)
+);
 
-wptr_full #(ASIZE) wptr_full
-(.wfull(wfull), .waddr(waddr),
-.wptr(wptr), .wrptr2(wrptr2),
-.winc(winc), .wclk(wclk), .wrst_n(wrst_n));
+write_ctrl #(ADDR_WIDTH) write_ctrl(
+    .wclk(wclk),
+    .wreset(wreset),
+    .wen(wen),
+    .rptr_sync(rptr_sync),
+    .waddr(waddr),
+    .wptr_gray(wptr_gray),
+    .full(full)
+);
+
+read_ctrl #(ADDR_WIDTH) read_ctrl(
+    .rclk(rclk),
+    .rreset(rreset),
+    .ren(ren),
+    .wptr_sync(wptr_sync),
+    .raddr(raddr),
+    .rptr_gray(rptr_gray),
+    .empty(empty),
+    .rvalid(rvalid)
+);
+
 endmodule
