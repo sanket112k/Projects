@@ -14,13 +14,12 @@ module fifo_mem #(
     output reg [DATA_WIDTH-1:0] rdata
 );
 localparam RAM_DEPTH = 1 << ADDR_WIDTH;
-
 reg [DATA_WIDTH-1:0] mem [0:RAM_DEPTH-1];
 
 always @(posedge wclk)
     if (wen) mem[waddr] <= wdata;
 
 always @(posedge rclk)
-    rdata <= mem[raddr];
+    if (ren) rdata <= mem[raddr];
 
 endmodule
