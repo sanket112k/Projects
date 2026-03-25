@@ -1,4 +1,4 @@
-`timescale 1ns/1ns
+`timescale 1ns/1ps
 
 module async_fifo_tb;
 parameter DATA_WIDTH = 8;
@@ -16,8 +16,6 @@ reg ren;
 wire [DATA_WIDTH-1:0] rdata;
 wire empty;
 wire rvalid;
-
-integer i;
 
 fifo_top #(
     .DATA_WIDTH(DATA_WIDTH),
@@ -61,32 +59,31 @@ initial begin
 
     $display("Writing to FIFO");
 
-    for(i = 0; i < DEPTH; i = i+1) begin
-        @(posedge wclk);
+    while(!full) begin
+        @(negedge wclk);
         wen = 1;
-        wdata = i;
+        wdata = wdata + 1;
     end
 
-    @(posedge wclk);
+    @(negedge wclk);
     wen = 0;
 
-    @(posedge wclk);
+    @(negedge wclk);
     wen = 1;
     wdata = 8'hAA;    // Try writing when FULL
 
-    @(posedge wclk);
+    @(negedge wclk);
     wen = 0;
-
     $display("Reading from FIFO");
-    repeat(16) begin
-        @(posedge rclk);
+    while(!empty) begin
+        @(negedge rclk);
         ren = 1;
     end
 
-    @(posedge rclk);
+    @(negedge rclk);
     ren = 0;
 
-    @(posedge rclk);
+    @(negedge rclk);
     ren = 1;            // Try reading when empty
 
     #50;
