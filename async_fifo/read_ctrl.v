@@ -27,16 +27,9 @@ always @(posedge rclk) begin:next_transition
         rptr_gray <= rgnext;
     end
 end
-/*
-always @(posedge rclk) begin
-    if (rreset)
-        ren_d <= 0;
-    else
-        ren_d <= ;
-end
-*/
+
 always @(*) begin:ptr_inc_logic
-    rbnext = rptr_bin + ren & ~empty;
+    rbnext = rptr_bin + (ren & ~empty);
     rgnext = (rbnext>>1) ^ rbnext;
 end
 
